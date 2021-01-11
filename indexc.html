@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="libs/FileSaver/FileSaver.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="content-to-pdf">
+        <page size="A4">
+            <p style="text-align: center; font-weight: bold;">LAPORAN PEKERJAAN</p><br><br>
+            <table id="table-bio" style="width:50%">
+            </table>
+            <br>
+            <table id="table-task" style="width: 100%; border:1px solid black;border-collapse:collapse;">
+                <colgroup>
+                    <col style="width:14%">
+                    <col style="width:42%">
+                    <col style="width:42%">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th style="border:1px solid black;">Minggu ke</th>
+                        <th style="border:1px solid black;">Jenis Pekerjaan yang dilakukan</th>
+                        <th style="border:1px solid black;">Hasil yang dicapai</th>
+                    </tr>
+                    <tr>
+                        <th style="border:1px solid black;">(1)</th>
+                        <th style="border:1px solid black;">(2)</th>
+                        <th style="border:1px solid black;">(3)</th>
+                    </tr>
+                </thead>
+                <tbody id="data-pekerjaan" style="border: 1px solid black;">
+                </tbody>
+            </table>
+            <br><br>
+            <div id="tanggal-penilaian">
+            </div>
+            <br>
+            <table id="table-ttd" style="text-align: center; width: 100%;">
+                <colgroup>
+                    <col style="width: 50%;">
+                    <col style="width: 50%;">
+                </colgroup>
+                <tr>
+                    <td>Pegawai yang Dinilai</td>
+                    <td>Pejabat Penilai</td>
+                </tr>
+                <tr class="ttd" style="height: 20mm;"></tr>
+                <tbody id="data-ttd">
+                </tbody>
+            </table>
+        </page>
+    </div>
+    <button onclick="Export2Doc('content-to-pdf');">Export as .doc</button>
+</body>
+
+</html>
+<script type="text/javascript">
+    var perminggu = ['I', 'II', 'III', 'IV', 'V'];
+
+    function listTugasPokok(tugas_pokok) {
+        return `
+        <ol>
+            ${tugas_pokok.map(function(listTugas){
+                return `<li>${listTugas.tugas}</li>`
+            }).join('')}
+        </ol>
+        `
+    }
+
+    function listHasilTugasPokok(tugas_pokok) {
+        return `
+        <ol>
+            ${tugas_pokok.map(function(listTugas){
+                return `<li>${listTugas.hasil}</li>`
+            }).join('')}
+        </ol>
+        `
+    }
+
+    function listTugasLainnya(tugas_lainnya) {
+        return `
+        <ol>
+            ${tugas_lainnya.map(function(listTugas){
+                return `<li>${listTugas.tugas}</li>`
+            }).join('')}
+        </ol>
+        `
+    }
+
+    function listHasilTugasLainnya(tugas_lainnya) {
+        return `
+        <ol>
+            ${tugas_lainnya.map(function(listTugas){
+                return `<li>${listTugas.hasil}</li>`
+            }).join('')}
+        </ol>
+        `
+    }
+   
+    function builtTable(data) {
+        var table = document.getElementById('data-pekerjaan')
+        for (var i = 0; i < data.length; i++) {
+            var row = `
+                <tr>
+                    <td style="text-align: center; vertical-align:top; border:1px solid black;" rowspan="4";>
+                        ${data[i].minggu}
+                    </td>
+                    <col>
+                        <td  style="border:1px solid black; border-top:none">
+                            <p style="text-decoration: underline; font-weight: bold; margin:0">Tugas pokok</p>
+                            ${listTugasPokok(data[i].tugas_pokok)}
+                            <br>
+                        </td>
+                        <td  style="border:1px solid black; border-top:none">
+                            <br>
+                            ${listHasilTugasPokok(data[i].tugas_pokok)}
+                            <br>
+                        </td>
+                    </col>   
+                </tr>
+                <tr>
+                    <col>
+                        <td  style="border:1px solid black; border-top:none">
+                            <p style="text-decoration: underline; font-weight: bold; margin:0">Tugas Lainnya</p>
+                            ${listTugasLainnya(data[i].tugas_lainnya)}
+                            <br>
+                        </td>
+                        <td  style="border:1px solid black; border-top:none">
+                            <br>
+                            ${listHasilTugasLainnya(data[i].tugas_lainnya)}
+                            <br>
+                        </td>
+                    </col>   
+                </tr>
+        `
+            table.innerHTML += row
+        }
+    }
+    function builtTanggal(waktu){
+        document.getElementById('tanggal-penilaian').innerHTML=`
+        <p style="font-weight: bold; margin:0">Penilaian Kinerja</p>
+        <p style="margin:0">Tanggal : ${waktu}</p>
+        `
+    }
+    function builtTTD(pegawai,penilai){
+    document.getElementById('data-ttd').innerHTML =`
+            <tr>
+                <td>(${pegawai.nama})</td>
+                <td>(${penilai.nama})</td>
+            </tr>
+            <tr>
+                <td>NIP. ${pegawai.nip}</td>
+                <td>NIP. ${penilai.nip}</td>
+            </tr>
+    `
+    }
+
+    function Export2Doc(element, filename = 'lp'){
+        var html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+        var footer = "</body></html>";
+        var html = html+document.getElementById(element).innerHTML+footer;
+    
+        
+        //link url
+        var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+        
+        //file name
+        filename = filename?filename+'.doc':'document.doc';
+        
+        // Creates the  download link element dynamically
+        var downloadLink = document.createElement("a");
+    
+        document.body.appendChild(downloadLink);
+        
+        //Link to the file
+        downloadLink.href = url;
+            
+        //Setting up file name
+        downloadLink.download = filename;
+            
+        //triggering the function
+        downloadLink.click();
+        //Remove the a tag after donwload starts.
+        document.body.removeChild(downloadLink);
+    }
+      
+    function getValue(minggu){
+        var myNewData = [];
+        perminggu.forEach(minggu => {   
+            var value= $.ajax({ 
+                url: `http://gsx2json.com/api?id=1tT9wurUdwecp6vYSy4m-KqZ0UgPNJ8rPgbDGThl6i1U&sheet=3&columns=false&_cn6ca=${minggu}`, 
+                async: false
+                }).responseText;
+            var jvalue = JSON.parse(value);
+            var sheetData = jvalue["rows"]
+            var i;
+            var tugas_pokok =[];
+            var tugas_lainnya =[];
+        
+            for (i = 0; i < sheetData.length; i++) {
+                var pekerjaan = sheetData[i]['_cpzh4'];
+                var hasil = sheetData[i]['_cre1l'];
+                var sifat = sheetData[i]["_cokwr"];
+                if (sheetData.length > 0 ) {
+                    if (sifat == "Pokok") {
+                        tugas_pokok.push(`{"tugas":"${pekerjaan}","hasil":"${hasil}"}`)
+                    } else {
+                        tugas_lainnya.push(`{"tugas":"${pekerjaan}","hasil":"${hasil}"}`)
+                    }
+                }
+                // document.getElementById('demo').innerHTML += (`<tr><td>${minggu}</td><td>${pekerjaan}</td><td>${sifat}</td></tr>`);
+            }; 
+            
+            var data = `{"minggu":"${minggu}","tugas_pokok":[${tugas_pokok}],"tugas_lainnya":[${tugas_lainnya}]}`
+            var obj = JSON.parse(data);
+            if (obj["tugas_pokok"].length > 1 || obj["tugas_lainnya"].length > 1) {
+                var obj = myNewData.push(obj);
+            }
+            // console.log(sheetData)
+        });
+        return myNewData;
+    }
+    // myNewData.push(getValue(minggu));
+    console.log(getValue(perminggu));
+
+    builtTable(getValue(perminggu));
+
+    $.getJSON("https://spreadsheets.google.com/feeds/cells/1tT9wurUdwecp6vYSy4m-KqZ0UgPNJ8rPgbDGThl6i1U/2/public/values?alt=json", function (data) {
+
+      var sd = data.feed.entry;
+      var bps = sd[1]['content']['$t'];
+      var nama = sd[5]['content']['$t'];
+      var waktu = sd[3]['content']['$t'];
+      var jabatan = sd[9]['content']['$t'];
+      var tanggal = sd[11]['content']['$t'];
+      var nip = sd[7]['content']['$t'];
+      var nip_penilai = sd[15]['content']['$t'];
+      var nama_penilai = sd[13]['content']['$t'];
+
+      document.getElementById('table-bio').innerHTML =`
+        <tr>
+                <td>BPS</td>
+                <td style="width: 5%;">:</td>
+                <td>${bps}</td>
+            </tr>
+            <tr>
+                <td>BULAN</td>
+                <td style="width: 5%;">:</td>
+                <td>${waktu}</td>
+            </tr>
+            <tr>
+                <td>NAMA</td>
+                <td style="width: 5%;">:</td>
+                <td>${nama}</td>
+            </tr>
+            <tr>
+                <td>JABATAN</td>
+                <td style="width: 5%;">:</td>
+                <td>${jabatan}</td>
+            </tr>
+        `
+        document.getElementById('tanggal-penilaian').innerHTML=`
+            <p style="font-weight: bold; margin:0">Penilaian Kinerja</p>
+            <p style="margin:0">Tanggal : ${tanggal}</p>
+        `
+        document.getElementById('data-ttd').innerHTML =`
+            <tr>
+                <td>(${nama})</td>
+                <td>(${nama_penilai})</td>
+            </tr>
+            <tr>
+                <td>NIP. ${nip}</td>
+                <td>NIP. ${nip_penilai}</td>
+            </tr>
+        `
+    });
+</script>

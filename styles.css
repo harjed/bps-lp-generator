@@ -1,0 +1,93 @@
+body {
+    background: rgb(204, 204, 204);
+    /* margin: 2.5cm 2.5cm 2.5cm 2.5cm;  */
+    font-size: 20px;
+}
+
+page {
+    background: white;
+    display: block;
+    margin: 0 auto;
+    margin-bottom: 0.5cm;
+    padding: 25mm 25mm 25mm 25mm;
+    box-shadow: 0 0 0.5cm rgba(0, 0, 0, 0.5);
+}
+
+page[size="A4"] {
+    width: 21cm;
+    /* height: 29.7cm; */
+}
+
+button {
+    float: right;
+    margin-bottom: 25px;
+    width: 20%;
+    height: 15mm;
+    background-color: lightblue;
+    color: white;
+    font-size: 24px;
+    border-radius: 8px;
+}
+
+
+/* 
+h3 {
+    font-family: 'Times New Roman', Times, serif;
+    font-style: bold;
+    text-align: center;
+}
+
+#table-task,
+#table-task th,
+#table-task td {
+    border: 1px solid #000;
+    border-collapse: collapse;
+}
+
+tr.ttd {
+    height: 25mm;
+}
+
+#table-ttd,
+#table-ttd tr {
+    width: 100%;
+    text-align: center;
+}
+
+p,
+ol {
+    margin: 0;
+}
+
+page[size="A4"][layout="landscape"] {
+    width: 29.7cm;
+    height: 21cm;
+}
+
+page[size="A3"] {
+    width: 29.7cm;
+    height: 42cm;
+}
+
+page[size="A3"][layout="landscape"] {
+    width: 42cm;
+    height: 29.7cm;
+}
+
+page[size="A5"] {
+    width: 14.8cm;
+    height: 21cm;
+}
+
+page[size="A5"][layout="landscape"] {
+    width: 21cm;
+    height: 14.8cm;
+} */
+
+@media print {
+    body,
+    page {
+        margin: 0;
+        box-shadow: 0;
+    }
+}
